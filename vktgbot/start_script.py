@@ -40,7 +40,6 @@ def start_script():
             item: dict
             if item["id"] <= last_known_id:
                 continue
-            logger.info(f"Working with post with ID: {item['id']}.")
             if blacklist_check(config.BLACKLIST, item["text"]):
                 continue
             if whitelist_check(config.WHITELIST, item["text"]):
@@ -51,25 +50,28 @@ def start_script():
             if config.SKIP_COPYRIGHTED_POST and "copyright" in item:
                 logger.info("Post was skipped as an copyrighted post.")
                 continue
-
+            if 'copy_history' in item:
+                if str(item['copy_history'][0]['owner_id'])[-len(str(item['copy_history'][0]['owner_id']))+1:] \
+                        in config.BLACKLIST_ID_REPOST:
+                    logger.info("Post was skipped as an copy post.")
+                    continue
             item_parts = {"post": item}
             group_name = ""
+
             if "copy_history" in item and not config.SKIP_REPOSTS:
-                item_parts["repost"] = item["copy_history"][0]
                 group_name = get_group_name(
                     config.VK_TOKEN,
                     config.REQ_VERSION,
-                    abs(item_parts["repost"]["owner_id"]),
+                    abs(item["copy_history"][0]["owner_id"]),
                 )
-                logger.info("Detected repost in the post.")
 
             for item_part in item_parts:
+
                 prepare_temp_folder()
-                repost_exists: bool = True if len(item_parts) > 1 else False
 
                 logger.info(f"Starting parsing of the {item_part}")
                 parsed_post = parse_post(
-                    item_parts[item_part], repost_exists, item_part, group_name
+                    item_parts[item_part], item_part, group_name
                 )
                 logger.info(f"Starting sending of the {item_part}")
                 executor.start(
@@ -80,7 +82,9 @@ def start_script():
                         parsed_post["text"],
                         parsed_post["photos"],
                         parsed_post["docs"],
+                        parsed_post["diswebpagep"],
+                        parsed_post["disnotif"],
                     ),
                 )
-
         write_id(new_last_id)
+        

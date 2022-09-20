@@ -45,8 +45,10 @@ def get_video_url(
         },
     )
     data = response.json()
-    if "response" in data:
+    if "files" in data["response"]["items"][0]:
         return data["response"]["items"][0]["files"].get("external", "")
+    elif "player" in data["response"]["items"][0]:
+        return data["response"]["items"][0].get("player", "")
     elif "error" in data:
         logger.error(
             "Error was detected when requesting data from VK: "
@@ -67,6 +69,35 @@ def get_group_name(vk_token: str, req_version: float, owner_id) -> str:
     data = response.json()
     if "response" in data:
         return data["response"][0]["name"]
+    elif "error" in data:
+        logger.error(
+            "Error was detected when requesting data from VK: "
+            f"{data['error']['error_msg']}"
+        )
+    return ""
+
+
+def get_user_name(vk_token: str, req_version: float, signer_id) -> str:
+    response = requests.get(
+        "https://api.vk.com/method/users.get",
+        params={
+            "access_token": vk_token,
+            "v": req_version,
+            "user_ids": signer_id,
+            "fields": "sex",
+            "lang": "ru",
+        },
+    )
+    data = response.json()
+    if "response" in data:
+        sex = data["response"][0]["sex"]
+        last_name = data["response"][0]["last_name"]
+        first_name = data["response"][0]["first_name"]
+        if sex == 1:
+            name = f"👩‍💻 <a href='https://vk.com/id{data['response'][0]['id']}'>{last_name} {first_name}</a>"
+        else:
+            name = f"👨‍💻 <a href='https://vk.com/id{data['response'][0]['id']}'>{last_name} {first_name}</a>"
+        return name
     elif "error" in data:
         logger.error(
             "Error was detected when requesting data from VK: "
