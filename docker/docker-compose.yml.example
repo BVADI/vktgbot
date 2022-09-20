@@ -2,9 +2,9 @@
 version: '3'
 
 services:
-  trialsportru: # name docker
+  app: # name docker
     build: ../
-    image: trialsportrubot  # name docker image
+    image: appbot  # name docker image
     volumes:
       - ../logs:/code/logs
       - ../last_id.txt:/code/last_id.txt
