@@ -6,7 +6,7 @@ import requests
 from loguru import logger
 
 from tools import prepare_text_for_html, prepare_text_for_reposts, add_urls_to_text, reformat_vk_links, del_hashtag_text
-from api_requests import get_video_url, get_user_name, get_audio_url
+from api_requests import get_video_url, get_user_name
 from config import VK_DOMAIN, VK_TOKEN, REQ_VERSION, SIGN_UP, SIGN, SKIP_REPOSTS, SRC_LINK, SIGN_LINK, DEL_HASHTAG
 from config import SHOW_WEB_PAGE_PREVIEW, SHOW_NOTIF, DISABLE_NOTIF_START, DISABLE_NOTIF_STOP
 from config import SHOW_CREATOR, SHOW_LINKS, SHOW_PHOTO, SHOW_DOCS, SHOW_PHOTOALBUMS, SHOW_ALBUM_PHOTO, SHOW_DOCS_PHOTO
@@ -191,10 +191,8 @@ def get_doc(doc: dict) -> Union[dict, None]:
         return None
     else:
         response = requests.get(doc["url"])
-
         with open(f'./temp/{doc["title"]}', "wb") as file:
             file.write(response.content)
-
     return {"title": doc["title"], "url": doc["url"]}
 
 
@@ -208,7 +206,6 @@ def get_disable_web_page_preview(text, videos, photos, diswebpagep) -> str:
             diswebpagep = "False"
         else:
             diswebpagep = "True"
-    logger.warning(f"disablewebpagepreview: {diswebpagep}")
     return diswebpagep
 
 
