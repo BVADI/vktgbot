@@ -1,7 +1,7 @@
 <h1 align="center">vktgbot</h1>
 <p align=center>
     <a target="_blank" href="https://www.python.org/downloads/" title="Python Version"><img src="https://img.shields.io/badge/python-%3E=_3.8-purple.svg"></a>
-    <a target="_blank" href="https://github.com/alcortazzo/vktgbot/releases"><img alt="docker image" src="https://img.shields.io/github/v/release/alcortazzo/vktgbot?include_prereleases"></a>
+    <a target="_blank" href="https://github.com/BVADI/vktgbot/releases"><img alt="docker image" src="https://img.shields.io/github/v/release/alcortazzo/vktgbot?include_prereleases"></a>
     <a target="_blank" href="LICENSE" title="License: GPL-3.0"><img src="https://img.shields.io/github/license/alcortazzo/vktgbot.svg?color=red"></a>
 </p> 
 
@@ -24,10 +24,10 @@ You can manually run the script with Python or Docker and leave it running in th
 ## Installation
 ```shell
 # clone the repository
-$ git clone https://github.com/alcortazzo/vktgbot.git
+$ git clone https://github.com/BVADI/vktgbot.git
 
 # if you want to clone specific version (for example v2.6)
-$ git clone -b v2.6 https://github.com/alcortazzo/vktgbot.git
+$ git clone -b v2.6 https://github.com/BVADI/vktgbot.git
 
 # change the working directory to vktgbot
 $ cd vktgbot
