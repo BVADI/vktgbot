@@ -52,10 +52,16 @@ async def send_text_post(bot: Bot, tg_channel: str, text: str, diswebpagep: bool
         )
 
         for part in prepared_text_parts:
-            await bot.send_message(
-                tg_channel, part, parse_mode=types.ParseMode.HTML, disable_web_page_preview=diswebpagep,
-                disable_notification=disnotif
-            )
+            if part == prepared_text_parts[-1]:
+                await bot.send_message(
+                    tg_channel, part, parse_mode=types.ParseMode.HTML, disable_web_page_preview=diswebpagep,
+                    disable_notification=disnotif
+                )
+            else:
+                await bot.send_message(
+                    tg_channel, part, parse_mode=types.ParseMode.HTML, disable_web_page_preview=True,
+                    disable_notification=disnotif
+                )
             await asyncio.sleep(0.5)
     logger.info("Text post sent to Telegram.")
 
