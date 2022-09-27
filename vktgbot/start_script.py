@@ -51,7 +51,10 @@ def start_script():
                 logger.info("Post was skipped as an copyrighted post.")
                 continue
             if 'copy_history' in item:
-                if str(item['copy_history'][0]['owner_id'])[-len(str(item['copy_history'][0]['owner_id']))+1:] \
+                if config.SKIP_REPOSTS:
+                    logger.info("Post was skipped as an repost.")
+                    continue
+                elif str(item['copy_history'][0]['owner_id'])[-len(str(item['copy_history'][0]['owner_id']))+1:] \
                         in config.BLACKLIST_ID_REPOST:
                     logger.info("Post was skipped as an copy post.")
                     continue
