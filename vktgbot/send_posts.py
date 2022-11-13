@@ -1,8 +1,8 @@
 import asyncio
 
-from loguru import logger
 from aiogram import Bot, types
 from aiogram.utils import exceptions
+from loguru import logger
 
 from tools import split_text
 
