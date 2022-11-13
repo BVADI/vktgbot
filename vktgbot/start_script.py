@@ -1,15 +1,15 @@
 from typing import Union
 
-from loguru import logger
 from aiogram import Bot, Dispatcher
 from aiogram.utils import executor
+from loguru import logger
 
 import config
-from api_requests import get_data_from_vk, get_group_name
-from last_id import write_id, read_id
+from api_requests import get_data_from_vk, get_group_name, get_user_name
+from last_id import read_id, write_id
 from parse_posts import parse_post
 from send_posts import send_post
-from tools import blacklist_check, whitelist_check, prepare_temp_folder
+from tools import blacklist_check, prepare_temp_folder, whitelist_check
 
 
 def start_script():
@@ -60,22 +60,26 @@ def start_script():
                     continue
             item_parts = {"post": item}
             group_name = ""
-
             if "copy_history" in item and not config.SKIP_REPOSTS:
-                group_name = get_group_name(
-                    config.VK_TOKEN,
-                    config.REQ_VERSION,
-                    abs(item["copy_history"][0]["owner_id"]),
-                )
+                if str(item["copy_history"][0]["owner_id"])[0] == "-":
+                    group_name = get_group_name(
+                        config.VK_TOKEN,
+                        config.REQ_VERSION,
+                        abs(item["copy_history"][0]["owner_id"]),
+                    )
+                else:
+                    group_name = get_user_name(
+                        config.VK_TOKEN,
+                        config.REQ_VERSION,
+                        abs(item["copy_history"][0]["owner_id"]),
+                    )
 
             for item_part in item_parts:
 
                 prepare_temp_folder()
 
                 logger.info(f"Starting parsing of the {item_part}")
-                parsed_post = parse_post(
-                    item_parts[item_part], item_part, group_name
-                )
+                parsed_post = parse_post(item_parts[item_part], item_part, group_name)
                 logger.info(f"Starting sending of the {item_part}")
                 executor.start(
                     dp,
@@ -90,4 +94,3 @@ def start_script():
                     ),
                 )
         write_id(new_last_id)
-        
