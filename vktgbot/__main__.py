@@ -11,8 +11,8 @@ import time
 
 from loguru import logger
 
-from start_script import start_script
 from config import SINGLE_START, TIME_TO_SLEEP
+from start_script import start_script
 from tools import prepare_temp_folder
 
 logger.add(
