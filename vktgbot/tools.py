@@ -9,10 +9,7 @@ def blacklist_check(blacklist: list, text: str) -> bool:
         text_lower = text.lower()
         for black_word in blacklist:
             if black_word.lower() in text_lower:
-                logger.info(
-                    "Post was skipped due to the detection of "
-                    f"blacklisted word: {black_word}."
-                )
+                logger.info("Post was skipped due to the detection of blacklisted word: {black_word}.")
                 return True
 
     return False
@@ -39,9 +36,7 @@ def prepare_temp_folder():
         os.mkdir("temp")
 
 
-def prepare_text_for_reposts(
-    text: str, item: dict, item_type: str, group_name: str
-) -> str:
+def prepare_text_for_reposts(text: str, item: dict, item_type: str, group_name: str) -> str:
     if item_type == "post":
         from_id = item["copy_history"][0]["from_id"]
         idd = item["copy_history"][0]["id"]
@@ -55,12 +50,7 @@ def prepare_text_for_reposts(
 
 
 def prepare_text_for_html(text: str) -> str:
-    return (
-        text.replace("&", "&amp;")
-        .replace("<", "&lt;")
-        .replace(">", "&gt;")
-        .replace('"', "&quot;")
-    )
+    return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace('"', "&quot;")
 
 
 def add_urls_to_text(text: str, urls: list, videos: list, albums: list) -> str:
@@ -71,6 +61,8 @@ def add_urls_to_text(text: str, urls: list, videos: list, albums: list) -> str:
         return text
 
     for video in videos:
+        if video["title"] == "":
+            video["title"] = video["url"]
         if video["url"] not in text:
             if first_link:
                 text = f'<a href="{video["url"]}"> </a>{text}\n\n🎥 <a href="{video["url"]}">{video["title"]}</a>' \
@@ -78,7 +70,7 @@ def add_urls_to_text(text: str, urls: list, videos: list, albums: list) -> str:
                 first_link = False
             else:
                 text += f'\n🎥 <a href="{video["url"]}">{video["title"]}</a>'
-        elif video["url"] not in text:
+        elif video["url"] in text:
             text = text.replace(f'{video["url"]}', f'🎥 <a href="{video["url"]}"> {video["title"]}</a>', 1)
         logger.info(f"Add video urls")
 
