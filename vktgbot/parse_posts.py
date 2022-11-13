@@ -5,17 +5,15 @@ from datetime import date, timedelta, datetime
 import requests
 from loguru import logger
 
-from tools import prepare_text_for_html, prepare_text_for_reposts, add_urls_to_text, reformat_vk_links, del_hashtag_text
 from api_requests import get_video_url, get_user_name
 from config import VK_DOMAIN, VK_TOKEN, REQ_VERSION, SIGN_UP, SIGN, SKIP_REPOSTS, SRC_LINK, SIGN_LINK, DEL_HASHTAG
+from tools import prepare_text_for_html, prepare_text_for_reposts, add_urls_to_text, reformat_vk_links, del_hashtag_text
 from config import SHOW_WEB_PAGE_PREVIEW, SHOW_NOTIF, DISABLE_NOTIF_START, DISABLE_NOTIF_STOP
 from config import SHOW_CREATOR, SHOW_LINKS, SHOW_PHOTO, SHOW_DOCS, SHOW_PHOTOALBUMS, SHOW_ALBUM_PHOTO, SHOW_DOCS_PHOTO
 from config import SHOW_VIDEOS, SHOW_MESSAGE
 
 
-def parse_post(
-     item: dict, item_type: str, group_name: str
-) -> dict:
+def parse_post(item: dict, item_type: str, group_name: str) -> dict:
     text = prepare_text_for_html(item["text"])
 
     if "copy_history" in item and not SKIP_REPOSTS:
@@ -104,13 +102,19 @@ def get_url(attachment: dict, text: str) -> Union[dict, None]:
 def get_video(attachment: dict) -> Union[dict, None]:
     owner_id = attachment["video"]["owner_id"]
     video_id = attachment["video"]["id"]
-    access_key = attachment["video"]["access_key"]
-    if "title" in attachment["video"]:
+    video_type = attachment["video"]["type"]
+    access_key = attachment["video"].get("access_key", "")
+    if "title" in attachment["video"] and attachment["video"]["title"] != "Видео недоступно":
         title = attachment["video"]["title"]
     else:
         title = ''
     video = get_video_url(VK_TOKEN, REQ_VERSION, owner_id, video_id, access_key)
-    return {"title": title, "url": video} if video else f"https://vk.com/video{owner_id}_{video_id}"
+    if video:
+        return {"title": title, "url": video}
+    elif video_type == "short_video":
+        return {"title": title, "url": f"https://vk.com/clip{owner_id}_{video_id}"}
+    else:
+        return {"title": title, "url": f"https://vk.com/video{owner_id}_{video_id}"}
 
 
 def get_album(attachment: dict) -> Union[dict, None]:
@@ -184,10 +188,7 @@ def get_photo(attachment: dict) -> Union[str, None]:
 
 def get_doc(doc: dict) -> Union[dict, None]:
     if doc["size"] > 50000000:
-        logger.info(
-            "The document was skipped due to its size exceeding the "
-            f"50MB limit: {doc['size']=}."
-        )
+        logger.info("The document was skipped due to its size exceeding the 50MB limit: {doc['size']=}.")
         return None
     else:
         response = requests.get(doc["url"])
